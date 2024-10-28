@@ -8,6 +8,7 @@ import tqdm
 
 from pandas_numpy_eval.data import HUMAN_EVAL, read_problems, stream_jsonl, write_jsonl
 from pandas_numpy_eval.execution import check_correctness
+from pathlib import Path
 
 
 def estimate_pass_at_k(
@@ -38,7 +39,7 @@ def estimate_pass_at_k(
 
 def evaluate_functional_correctness(
     sample_file: str,
-    k: List[int] = [1, 10, 100],
+    k: List[int] = [1],
     n_workers: int = 4,
     timeout: float = 3.0,
     problem_file: str = HUMAN_EVAL,
@@ -47,7 +48,6 @@ def evaluate_functional_correctness(
     Evaluates the functional correctness of generated samples, and writes
     results to f"{sample_file}_results.jsonl.gz"
     """
-
     problems = read_problems(problem_file)
 
     # Check the generated samples against test suites.
@@ -107,5 +107,20 @@ def evaluate_functional_correctness(
     metric_file = sample_file + "_metrics.jsonl"
     print(f"Writing metrics to {metric_file}...")
     write_jsonl(metric_file, return_pass_at_k())
-
+    
+    # paddings metrics
+    all_metrics = [_ for _ in stream_jsonl("dump/all_metrics.jsonl")]
+    eval_file  = [_ for _ in stream_jsonl(sample_file)]
+    
+    for idx, dct in enumerate(stream_jsonl(out_file)):
+        eval_file[idx]["matched"] = [dct["passed"]]
+    
+    acc = pass_at_k["pass@1"]
+    for dct in all_metrics:
+        if dct["dataset"] == Path(sample_file).stem:
+            dct["metric"]["accuracy@1"] = round(acc, 4)
+    
+    write_jsonl(sample_file, eval_file)
+    write_jsonl("dump/all_metrics.jsonl", all_metrics)
+    
     return pass_at_k
