@@ -12,8 +12,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 # You can choose from the two options "pandas" or "numpy".
 # --------------------------------------------------------
 LIB = os.getenv("LIB")
-print(LIB)
 assert LIB == "pandas" or LIB == "numpy"
+
 HUMAN_EVAL = os.path.join(ROOT, "..", "data", "PandasEval.jsonl.gz") if LIB == "pandas" else os.path.join(ROOT, "..", "data", "NumpyEval.jsonl.gz")
 
 print("***"*20)
