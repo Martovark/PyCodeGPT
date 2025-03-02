@@ -14,7 +14,7 @@ from pathlib import Path
 def estimate_pass_at_k(
     num_samples: Union[int, List[int], np.ndarray],
     num_correct: Union[List[int], np.ndarray],
-    k: int
+    k: int,
 ) -> np.ndarray:
     """
     Estimates pass@k of each problem and returns them in an array.
@@ -34,7 +34,9 @@ def estimate_pass_at_k(
         assert len(num_samples) == len(num_correct)
         num_samples_it = iter(num_samples)
 
-    return np.array([estimator(int(n), int(c), k) for n, c in zip(num_samples_it, num_correct)])
+    return np.array(
+        [estimator(int(n), int(c), k) for n, c in zip(num_samples_it, num_correct)]
+    )
 
 
 def evaluate_functional_correctness(
@@ -52,7 +54,6 @@ def evaluate_functional_correctness(
 
     # Check the generated samples against test suites.
     with ThreadPoolExecutor(max_workers=n_workers) as executor:
-
         futures = []
         completion_id = Counter()
         n_samples = 0
@@ -86,8 +87,11 @@ def evaluate_functional_correctness(
     correct = np.array(correct)
 
     ks = k
-    pass_at_k = {f"pass@{k}": estimate_pass_at_k(total, correct, k).mean()
-                 for k in ks if (total >= k).all()}
+    pass_at_k = {
+        f"pass@{k}": estimate_pass_at_k(total, correct, k).mean()
+        for k in ks
+        if (total >= k).all()
+    }
 
     # Finally, save the results in one file:
     def combine_results():
@@ -104,23 +108,27 @@ def evaluate_functional_correctness(
 
     def return_pass_at_k():
         yield pass_at_k
+
     metric_file = sample_file + "_metrics.jsonl"
     print(f"Writing metrics to {metric_file}...")
     write_jsonl(metric_file, return_pass_at_k())
-    
+
     # paddings metrics
     all_metrics = [_ for _ in stream_jsonl("dump/all_metrics.jsonl")]
-    eval_file  = [_ for _ in stream_jsonl(sample_file)]
-    
+    eval_file = [_ for _ in stream_jsonl(sample_file)]
+
     for idx, dct in enumerate(stream_jsonl(out_file)):
-        eval_file[idx]["matched"] = [dct["passed"]]
-    
+        passed = dct["passed"]
+        if isinstance(passed, list):
+            passed = passed[0]
+        eval_file[idx]["matched"] = passed
+
     acc = pass_at_k["pass@1"]
     for dct in all_metrics:
         if dct["dataset"] == Path(sample_file).stem:
-            dct["metric"]["accuracy@1"] = round(acc, 4)
-    
+            dct["metric"]["accuracy"] = round(acc, 4)
+
     write_jsonl(sample_file, eval_file)
     write_jsonl("dump/all_metrics.jsonl", all_metrics)
-    
+
     return pass_at_k
