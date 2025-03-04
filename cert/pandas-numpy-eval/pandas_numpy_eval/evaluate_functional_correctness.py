@@ -12,9 +12,9 @@ from pandas_numpy_eval.evaluation import evaluate_functional_correctness
 
 def entry_point(
     sample_file: str,
+    dump: str,
     k: int = 1,
     n_workers: int = 4,
-    dump: str = "dump",
     timeout: float = 10.0,
     problem_file: str = HUMAN_EVAL,
 ):
