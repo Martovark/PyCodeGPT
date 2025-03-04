@@ -41,6 +41,7 @@ def estimate_pass_at_k(
 
 def evaluate_functional_correctness(
     sample_file: str,
+    dump: str = "dump",
     k: List[int] = [1],
     n_workers: int = 4,
     timeout: float = 3.0,
@@ -114,7 +115,7 @@ def evaluate_functional_correctness(
     write_jsonl(metric_file, return_pass_at_k())
 
     # paddings metrics
-    all_metrics = [_ for _ in stream_jsonl("dump/all_metrics.jsonl")]
+    all_metrics = [_ for _ in stream_jsonl(f"{dump}/all_metrics.jsonl")]
     eval_file = [_ for _ in stream_jsonl(sample_file)]
 
     for idx, dct in enumerate(stream_jsonl(out_file)):
@@ -129,6 +130,6 @@ def evaluate_functional_correctness(
             dct["metric"]["accuracy"] = round(acc, 4)
 
     write_jsonl(sample_file, eval_file)
-    write_jsonl("dump/all_metrics.jsonl", all_metrics)
+    write_jsonl(f"{dump}/all_metrics.jsonl", all_metrics)
 
     return pass_at_k

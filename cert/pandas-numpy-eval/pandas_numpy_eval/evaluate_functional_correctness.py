@@ -2,7 +2,7 @@ import fire
 import os
 import sys
 
-p  = os.getcwd()
+p = os.getcwd()
 print(p)
 sys.path.append(p)
 
@@ -10,11 +10,11 @@ from pandas_numpy_eval.data import HUMAN_EVAL
 from pandas_numpy_eval.evaluation import evaluate_functional_correctness
 
 
-
 def entry_point(
     sample_file: str,
     k: int = 1,
     n_workers: int = 4,
+    dump: str = "dump",
     timeout: float = 10.0,
     problem_file: str = HUMAN_EVAL,
 ):
@@ -24,7 +24,9 @@ def entry_point(
     """
     if isinstance(k, int):
         k = [k]
-    results = evaluate_functional_correctness(sample_file, k, n_workers, timeout, problem_file)
+    results = evaluate_functional_correctness(
+        sample_file, k, n_workers, dump, timeout, problem_file
+    )
     print(results)
 
 
