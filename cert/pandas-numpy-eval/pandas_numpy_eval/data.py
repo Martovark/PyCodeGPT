@@ -108,7 +108,7 @@ def remove_func_name(solution: str):
 
 def hook(dct):
     if "parsed_predict" in dct:
-        parsed_predict = dct.pop("parsed_predict")
+        parsed_predict = dct["parsed_predict"]
         if isinstance(parsed_predict, list):
             assert len(parsed_predict) == 1, (
                 f"len of parsed_predict must be 1, but len: {len(parsed_predict)}"
