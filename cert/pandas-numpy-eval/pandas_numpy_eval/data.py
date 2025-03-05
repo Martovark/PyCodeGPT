@@ -116,11 +116,13 @@ def hook(dct):
             parsed_predict = parsed_predict[0]
         try:
             solution = extract_python_code(parsed_predict)[0]
+            if solution == "":
+                solution = parsed_predict
             solution = remove_func_name(solution)
             dct["completion"] = solution
         except:
             print("Empty completion!")
-            dct["completion"] = parsed_predict
+            dct["completion"] = remove_func_name(parsed_predict)
     return dct
 
 
