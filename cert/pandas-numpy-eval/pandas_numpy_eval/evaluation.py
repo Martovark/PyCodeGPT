@@ -110,9 +110,9 @@ def evaluate_functional_correctness(
     def return_pass_at_k():
         yield pass_at_k
 
-    metric_file = sample_file + "_metrics.jsonl"
-    print(f"Writing metrics to {metric_file}...")
-    write_jsonl(metric_file, return_pass_at_k())
+    # metric_file = sample_file + "_metrics.jsonl"
+    # print(f"Writing metrics to {metric_file}...")
+    # write_jsonl(metric_file, return_pass_at_k())
 
     # paddings metrics
     all_metrics = [_ for _ in stream_jsonl(f"{dump}/all_metrics.jsonl")]
@@ -131,5 +131,10 @@ def evaluate_functional_correctness(
 
     write_jsonl(sample_file, eval_file)
     write_jsonl(f"{dump}/all_metrics.jsonl", all_metrics)
+
+    try:
+        Path(out_file).resolve().unlink()
+    except Exception as e:
+        print(f"Exception in unlink: {e}")
 
     return pass_at_k
