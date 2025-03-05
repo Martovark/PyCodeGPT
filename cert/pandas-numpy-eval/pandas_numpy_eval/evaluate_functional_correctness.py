@@ -25,7 +25,12 @@ def entry_point(
     if isinstance(k, int):
         k = [k]
     results = evaluate_functional_correctness(
-        sample_file, k, n_workers, dump, timeout, problem_file
+        sample_file,
+        k=k,
+        n_workers=n_workers,
+        dump=dump,
+        timeout=timeout,
+        problem_file=problem_file,
     )
     print(results)
 
